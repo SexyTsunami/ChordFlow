@@ -1,0 +1,17 @@
+{
+  "name": "ChordFlow",
+  "short_name": "ChordFlow",
+  "description": "Personal guitar songbook for practice.",
+  "start_url": "/",
+  "display": "standalone",
+  "background_color": "#121010",
+  "theme_color": "#121010",
+  "icons": [
+    {
+      "src": "/icon.svg",
+      "sizes": "any",
+      "type": "image/svg+xml",
+      "purpose": "any"
+    }
+  ]
+}

@@ -1,0 +1,197 @@
+@import "tailwindcss";
+
+/*
+ * ChordFlow design tokens.
+ * A single dark, warm "practice studio" palette: charcoal paper, off-white ink,
+ * muted amber accent. Everything is expressed as a Tailwind theme colour so
+ * utilities such as `bg-surface` / `text-ink-muted` exist across the app.
+ */
+@theme {
+  --color-canvas: #121010;
+  --color-surface: #1a1715;
+  --color-surface-2: #221e1b;
+  --color-surface-3: #2b2623;
+  --color-line: #332d28;
+  --color-line-strong: #453d36;
+
+  --color-ink: #f4efe6;
+  --color-ink-muted: #a89f93;
+  --color-ink-faint: #7b7368;
+
+  --color-amber: #e0a458;
+  --color-amber-soft: #f0c389;
+  --color-amber-deep: #b67f3a;
+  --color-amber-ink: #1a1208;
+
+  --color-sage: #8aa88c;
+  --color-rose: #d2796f;
+
+  --font-sans:
+    ui-sans-serif, system-ui, -apple-system, "Segoe UI", Inter, Roboto,
+    "Helvetica Neue", "PingFang TC", "Microsoft JhengHei", "Noto Sans TC",
+    "Hiragino Sans", sans-serif;
+  --font-mono:
+    ui-monospace, "Cascadia Mono", "SFMono-Regular", Menlo, Consolas,
+    "Noto Sans Mono CJK TC", monospace;
+
+  --radius-panel: 1rem;
+
+  --animate-fade-in: fade-in 0.28s ease-out both;
+  --animate-rise: rise 0.32s cubic-bezier(0.2, 0.8, 0.2, 1) both;
+  --animate-shimmer: shimmer 1.6s linear infinite;
+
+  @keyframes fade-in {
+    from {
+      opacity: 0;
+    }
+    to {
+      opacity: 1;
+    }
+  }
+  @keyframes rise {
+    from {
+      opacity: 0;
+      transform: translateY(8px);
+    }
+    to {
+      opacity: 1;
+      transform: translateY(0);
+    }
+  }
+  @keyframes shimmer {
+    from {
+      background-position: -200% 0;
+    }
+    to {
+      background-position: 200% 0;
+    }
+  }
+}
+
+@layer base {
+  * {
+    border-color: var(--color-line);
+  }
+
+  html {
+    color-scheme: dark;
+    -webkit-text-size-adjust: 100%;
+  }
+
+  body {
+    background-color: var(--color-canvas);
+    color: var(--color-ink);
+    font-family: var(--font-sans);
+    font-feature-settings: "cv02", "cv03", "cv04";
+    -webkit-font-smoothing: antialiased;
+    overflow-x: hidden;
+  }
+
+  /* Warm paper grain so large dark areas do not look flat. */
+  body::before {
+    content: "";
+    position: fixed;
+    inset: 0;
+    pointer-events: none;
+    z-index: 0;
+    background:
+      radial-gradient(
+        60rem 40rem at 15% -10%,
+        rgb(224 164 88 / 0.07),
+        transparent 70%
+      ),
+      radial-gradient(
+        50rem 36rem at 95% 0%,
+        rgb(138 168 140 / 0.045),
+        transparent 65%
+      );
+  }
+
+  :focus-visible {
+    outline: 2px solid var(--color-amber);
+    outline-offset: 2px;
+    border-radius: 0.35rem;
+  }
+
+  ::selection {
+    background: rgb(224 164 88 / 0.3);
+    color: var(--color-ink);
+  }
+
+  /* Scrollbars that match the paper theme. */
+  * {
+    scrollbar-color: var(--color-line-strong) transparent;
+    scrollbar-width: thin;
+  }
+  *::-webkit-scrollbar {
+    width: 10px;
+    height: 10px;
+  }
+  *::-webkit-scrollbar-thumb {
+    background: var(--color-line-strong);
+    border-radius: 999px;
+    border: 3px solid transparent;
+    background-clip: content-box;
+  }
+  *::-webkit-scrollbar-thumb:hover {
+    background: var(--color-ink-faint);
+    background-clip: content-box;
+  }
+}
+
+@layer components {
+  .panel {
+    background-color: var(--color-surface);
+    border: 1px solid var(--color-line);
+    border-radius: var(--radius-panel);
+  }
+
+  .panel-raised {
+    background-color: var(--color-surface);
+    border: 1px solid var(--color-line);
+    border-radius: var(--radius-panel);
+    box-shadow:
+      0 1px 0 0 rgb(255 255 255 / 0.03) inset,
+      0 18px 40px -28px rgb(0 0 0 / 0.9);
+  }
+
+  .skeleton {
+    background: linear-gradient(
+      90deg,
+      var(--color-surface-2) 25%,
+      var(--color-surface-3) 50%,
+      var(--color-surface-2) 75%
+    );
+    background-size: 200% 100%;
+    animation: var(--animate-shimmer);
+    border-radius: 0.5rem;
+  }
+
+  /* Chord sheet typography */
+  .chord-token {
+    color: var(--color-amber);
+    font-weight: 650;
+    letter-spacing: 0.01em;
+    font-variant-ligatures: none;
+  }
+
+  .lyric-text {
+    color: var(--color-ink);
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+    scroll-behavior: auto !important;
+  }
+}
+
+/* Embed mode: the host page owns the chrome, so drop our own background art. */
+.embed-root body::before {
+  display: none;
+}
