@@ -168,6 +168,16 @@
   }
 
   /* Chord sheet typography */
+  .chord-sheet {
+    font-size: calc(var(--cf-sheet-size) * 0.8);
+  }
+
+  @media (min-width: 640px) {
+    .chord-sheet {
+      font-size: var(--cf-sheet-size);
+    }
+  }
+
   .chord-token {
     color: var(--color-amber);
     font-weight: 650;

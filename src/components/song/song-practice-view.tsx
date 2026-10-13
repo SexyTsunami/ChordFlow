@@ -300,13 +300,11 @@ function SongWorkspace({
             {song.releaseYear ? (
               <Badge tone="outline">{song.releaseYear}</Badge>
             ) : null}
-            {arrangement ? (
+            {arrangement && arrangement.status !== "user" ? (
               <Badge tone={ARRANGEMENT_STATUS_META[arrangement.status].tone}>
                 {ARRANGEMENT_STATUS_META[arrangement.status].label}
               </Badge>
-            ) : (
-              <Badge>No arrangement</Badge>
-            )}
+            ) : null}
             {arrangement?.lyricsRights === "original-sample" ? (
               <Badge tone="sage">Original sample lyrics</Badge>
             ) : null}

@@ -263,8 +263,12 @@ export function ChordSheet({
 }: ChordSheetProps) {
   return (
     <div
-      className={cn("space-y-7", className)}
-      style={{ fontSize: `${(fontScale * 1.0625).toFixed(3)}rem` }}
+      className={cn("chord-sheet space-y-7", className)}
+      style={
+        {
+          "--cf-sheet-size": `${(fontScale * 1.0625).toFixed(3)}rem`,
+        } as React.CSSProperties
+      }
     >
       {arrangement.notes ? (
         <DetailsButton title="Song Details" text={arrangement.notes} />

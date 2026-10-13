@@ -166,6 +166,9 @@ export function PlaylistDetailView({ playlistId }: { playlistId: string }) {
               {href ? (
                 <Link href={href} className="min-w-0 flex-1 hover:opacity-80">
                   <p className="truncate text-sm text-ink">{track.title}</p>
+                  {linked?.titleEn && linked.titleEn !== track.title ? (
+                    <p className="truncate text-xs text-ink-faint">{linked.titleEn}</p>
+                  ) : null}
                   <p className="truncate text-xs text-ink-muted">{track.artist}</p>
                 </Link>
               ) : (
@@ -174,13 +177,13 @@ export function PlaylistDetailView({ playlistId }: { playlistId: string }) {
                   <p className="truncate text-xs text-ink-muted">{track.artist}</p>
                 </div>
               )}
-              {arrangement ? (
+              {arrangement && arrangement.status !== "user" ? (
                 <Badge tone={ARRANGEMENT_STATUS_META[arrangement.status].tone}>
                   {ARRANGEMENT_STATUS_META[arrangement.status].label}
                 </Badge>
-              ) : (
+              ) : !arrangement ? (
                 <Badge>No chords</Badge>
-              )}
+              ) : null}
               {href ? (
                 <Button variant="secondary" size="sm" asChild>
                   <Link href={href}>{arrangement ? "Open" : "Song"}</Link>

@@ -4,7 +4,7 @@ import * as React from "react";
 import Link from "next/link";
 import { Heart, Music2, Star } from "lucide-react";
 import { Badge } from "@/components/ui/primitives";
-import { ARRANGEMENT_STATUS_META, type Song } from "@/lib/domain/types";
+import type { Song } from "@/lib/domain/types";
 import { useLibrary } from "@/components/providers/library-provider";
 import { cn } from "@/lib/utils";
 
@@ -15,10 +15,9 @@ function SingingKeyBadge({ songId }: { songId: string }) {
   return <Badge tone="sage">sing {key}</Badge>;
 }
 
-function StatusBadge({ song }: { song: Song }) {
-  const meta = ARRANGEMENT_STATUS_META[song.arrangementStatus];
-  if (song.arrangementStatus === "unavailable") return null;
-  return <Badge tone={meta.tone}>{meta.label}</Badge>;
+function EnglishTitle({ song, className }: { song: Song; className?: string }) {
+  if (!song.titleEn || song.titleEn === song.title) return null;
+  return <span className={cn("truncate text-xs text-ink-faint", className)}>{song.titleEn}</span>;
 }
 
 export function FavoriteButton({
@@ -74,15 +73,11 @@ export function SongRow({
         )}
 
         <span className="min-w-0 flex-1">
-          <span className="flex items-baseline gap-2">
+          <span className="flex flex-col gap-0.5 sm:flex-row sm:items-baseline sm:gap-2">
             <span className="truncate text-[15px] font-medium text-ink">
               {song.title}
             </span>
-            {song.titleEn && song.titleEn !== song.title ? (
-              <span className="hidden truncate text-xs text-ink-faint sm:inline">
-                {song.titleEn}
-              </span>
-            ) : null}
+            <EnglishTitle song={song} />
           </span>
           <span className="flex items-center gap-1.5 truncate text-xs text-ink-muted">
             <span className="truncate">{song.artist}</span>
@@ -106,7 +101,6 @@ export function SongRow({
           {song.difficulty ? (
             <Badge tone="outline">{song.difficulty}</Badge>
           ) : null}
-          <StatusBadge song={song} />
         </span>
       </Link>
 
@@ -131,11 +125,7 @@ export function SongCard({ song }: { song: Song }) {
       </div>
       <div className="relative z-10 min-w-0 pointer-events-none">
         <p className="truncate text-[15px] font-medium text-ink">{song.title}</p>
-        {song.titlePinyin ? (
-          <p className="truncate text-[11px] text-ink-faint italic">
-            {song.titlePinyin}
-          </p>
-        ) : null}
+        <EnglishTitle song={song} className="mt-0.5 block" />
         <p className="mt-1 truncate text-xs text-ink-muted">
           {song.artist}
           {song.releaseYear ? ` · ${song.releaseYear}` : ""}
@@ -143,7 +133,6 @@ export function SongCard({ song }: { song: Song }) {
       </div>
       <div className="relative z-10 mt-auto flex flex-wrap gap-1.5 pt-1 pointer-events-none">
         <SingingKeyBadge songId={song.id} />
-        <StatusBadge song={song} />
       </div>
     </div>
   );
