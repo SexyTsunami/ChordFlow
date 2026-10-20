@@ -3,13 +3,12 @@
 import * as React from "react";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
-import { Guitar, Menu, Plus, Search, X } from "lucide-react";
+import { Guitar, Menu, Search, X } from "lucide-react";
 import { APP_NAME, APP_TAGLINE } from "@/lib/app-config";
 import { cn } from "@/lib/utils";
 import { Button } from "@/components/ui/button";
 import { Badge, Divider } from "@/components/ui/primitives";
 import { useLibrary } from "@/components/providers/library-provider";
-import { ImportDialog } from "@/components/playlist/import-dialog";
 import { GlobalSearch } from "@/components/search/global-search";
 import { isActivePath, NAV_ITEMS } from "./nav-items";
 
@@ -100,15 +99,6 @@ function SidebarContent({ onNavigate }: { onNavigate?: () => void }) {
   return (
     <div className="flex h-full flex-col gap-5 p-4">
       <Wordmark />
-
-      <ImportDialog
-        trigger={
-          <Button variant="primary" className="w-full justify-start gap-2">
-            <Plus />
-            Import playlist
-          </Button>
-        }
-      />
 
       <NavLinks onNavigate={onNavigate} />
 

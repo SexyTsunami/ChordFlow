@@ -2,10 +2,8 @@
 
 import * as React from "react";
 import Link from "next/link";
-import { ListMusic, Plus } from "lucide-react";
-import { Button } from "@/components/ui/button";
+import { ListMusic } from "lucide-react";
 import { Badge, EmptyState, SectionHeading } from "@/components/ui/primitives";
-import { ImportDialog } from "@/components/playlist/import-dialog";
 import { useLibrary } from "@/components/providers/library-provider";
 import { formatRelativeTime } from "@/lib/utils";
 
@@ -17,31 +15,13 @@ export function PlaylistsView() {
       <SectionHeading
         title="Playlists"
         description="Optional title lists. The songbook itself comes from ChordDatabase."
-        action={
-          <ImportDialog
-            trigger={
-              <Button variant="primary" size="sm">
-                <Plus /> Import playlist
-              </Button>
-            }
-          />
-        }
       />
 
       {playlists.length === 0 ? (
         <EmptyState
           icon={<ListMusic className="size-5" />}
-          title="No playlists yet"
-          description="Paste a Spotify or YouTube link — no official API keys needed. Then estimate chords for the whole list."
-          action={
-            <ImportDialog
-              trigger={
-                <Button variant="secondary" size="sm">
-                  <Plus /> Import a playlist
-                </Button>
-              }
-            />
-          }
+          title="No playlists"
+          description="This songbook is the ChordDatabase. Playlists are only leftover lists if you already had some."
         />
       ) : (
         <div className="grid gap-3 sm:grid-cols-2 lg:grid-cols-3">
