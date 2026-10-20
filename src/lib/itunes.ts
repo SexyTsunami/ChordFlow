@@ -169,20 +169,24 @@ export async function searchItunesPreview(
     ? ["TW", "HK", undefined]
     : [undefined, "TW", "HK"];
 
-  let best: { preview: ItunesPreview; score: number } | null = null;
+  let winner: ItunesPreview | null = null;
+  let winnerScore = -1;
 
   for (const term of itunesSearchTerms(cleaned)) {
     const batches = await Promise.all(
       countries.map((country) => fetchItunesSongs(term, country)),
     );
     for (const results of batches) {
-      const preview = pickItunesPreview(results, cleaned);
-      if (!preview) continue;
-      const score = scoreItunesResult(preview, cleaned);
-      if (!best || score > best.score) best = { preview, score };
+      const candidate = pickItunesPreview(results, cleaned);
+      if (!candidate) continue;
+      const score = scoreItunesResult(candidate, cleaned);
+      if (score > winnerScore) {
+        winner = candidate;
+        winnerScore = score;
+      }
     }
-    if (best && best.score >= 12) return best.preview;
+    if (winnerScore >= 12) return winner;
   }
 
-  return best?.preview ?? null;
+  return winner;
 }
