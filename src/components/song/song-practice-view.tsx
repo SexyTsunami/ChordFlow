@@ -52,8 +52,10 @@ import { ChordDiagramRow } from "./chord-diagram";
 import { ChordSheet, sectionAnchorId } from "./chord-sheet";
 import { PracticeDock } from "./practice-dock";
 import { FavoriteButton } from "./song-list";
+import { SongPreviewButton, SongPreviewCaption } from "./song-preview-button";
 import { SongToolbar } from "./song-toolbar";
-import { useAutoscroll, useScrollProgress } from "./use-autoscroll";
+import { useScrollProgress } from "./use-autoscroll";
+import { useSongPreview } from "./use-song-preview";
 
 export function SongPracticeView({ songId }: { songId: string }) {
   const library = useLibrary();
@@ -120,7 +122,6 @@ function SongWorkspace({
   const [capo, setCapo] = React.useState(0);
   const [showTranslation, setShowTranslation] = React.useState(false);
   const [activeChord, setActiveChord] = React.useState<string | null>(null);
-  const [scrolling, setScrolling] = React.useState(false);
   const [metronomeOn, setMetronomeOn] = React.useState(false);
   const [loopSectionId, setLoopSectionId] = React.useState<string | null>(null);
   const [beatsPerBar, setBeatsPerBar] = React.useState(4);
@@ -153,7 +154,6 @@ function SongWorkspace({
     setCapo(arrangement?.capo ?? 0);
     setActiveChord(null);
     setLoopSectionId(null);
-    setScrolling(false);
     if (arrangement?.timeSignature?.startsWith("3")) setBeatsPerBar(3);
     else if (arrangement?.timeSignature?.startsWith("6")) setBeatsPerBar(6);
     else setBeatsPerBar(4);
@@ -193,11 +193,16 @@ function SongWorkspace({
   );
 
   const progress = useScrollProgress();
-  useAutoscroll({
-    speed: preferences.scrollSpeed,
-    running: scrolling,
-    onReachEnd: () => setScrolling(false),
+  const preview = useSongPreview({
+    title: song.title,
+    artist: song.artist,
+    titleEn: song.titleEn,
+    artistZh: song.artistZhHans,
   });
+
+  React.useEffect(() => {
+    if (preview.playing) setMetronomeOn(false);
+  }, [preview.playing]);
 
   const practicedToday = React.useMemo(() => {
     const start = new Date();
@@ -213,7 +218,7 @@ function SongWorkspace({
   const startEditor = (target: ChordArrangement | null) => {
     setEditingId(target?.id ?? null);
     setEditing(true);
-    setScrolling(false);
+    preview.stop();
     setMetronomeOn(false);
   };
 
@@ -289,12 +294,14 @@ function SongWorkspace({
               {song.title}
             </h1>
             <FavoriteButton songId={song.id} />
+            <SongPreviewButton preview={preview} compact />
           </div>
           <p className="mt-0.5 text-sm text-ink-muted">
             {song.artist}
             {song.titleEn && song.titleEn !== song.title ? ` · ${song.titleEn}` : ""}
             {song.titlePinyin ? ` · ${song.titlePinyin}` : ""}
           </p>
+          <SongPreviewCaption preview={preview} />
           <div className="mt-2 flex flex-wrap items-center gap-1.5">
             {song.album ? <Badge tone="outline">{song.album}</Badge> : null}
             {song.releaseYear ? (
@@ -508,14 +515,8 @@ function SongWorkspace({
           ) : null}
 
           <PracticeDock
-            scrolling={scrolling}
-            onScrollingChange={setScrolling}
-            scrollSpeed={preferences.scrollSpeed}
-            onScrollSpeedChange={(value) =>
-              void updatePreferences({ scrollSpeed: value })
-            }
+            preview={preview}
             onResetScroll={() => {
-              setScrolling(false);
               window.scrollTo({ top: 0, behavior: "smooth" });
             }}
             metronomeOn={metronomeOn}

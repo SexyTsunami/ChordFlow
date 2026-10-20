@@ -5,9 +5,6 @@ import {
   ChevronDown,
   ChevronUp,
   CircleCheck,
-  Gauge,
-  Pause,
-  Play,
   Repeat,
   RotateCcw,
   Timer,
@@ -17,20 +14,19 @@ import { Slider, Tooltip } from "@/components/ui/controls";
 import { cn } from "@/lib/utils";
 import type { ArrangementSection } from "@/lib/domain/types";
 import { SECTION_LABELS } from "@/lib/domain/types";
+import { SongPreviewButton } from "./song-preview-button";
 import { useMetronome } from "./use-metronome";
 import { sectionAnchorId } from "./chord-sheet";
+import type { SongPreviewState } from "./use-song-preview";
 
 /**
- * The practice dock: autoscroll transport, metronome, section loop and the
+ * The practice dock: song preview, metronome, section loop and the
  * "practised" marker. Fixed to the bottom so the controls stay reachable with
  * a guitar on your lap, and clear of the mobile tab bar.
  */
 
 export type PracticeDockProps = {
-  scrolling: boolean;
-  onScrollingChange: (value: boolean) => void;
-  scrollSpeed: number;
-  onScrollSpeedChange: (value: number) => void;
+  preview: SongPreviewState;
   onResetScroll: () => void;
   metronomeOn: boolean;
   onMetronomeChange: (value: boolean) => void;
@@ -80,16 +76,7 @@ export function PracticeDock(props: PracticeDockProps) {
         />
 
         <div className="flex items-center gap-2 px-3 py-2.5">
-          <Tooltip label={props.scrolling ? "Pause autoscroll" : "Start autoscroll"}>
-            <Button
-              variant={props.scrolling ? "primary" : "secondary"}
-              size="icon-lg"
-              onClick={() => props.onScrollingChange(!props.scrolling)}
-              aria-label={props.scrolling ? "Pause autoscroll" : "Start autoscroll"}
-            >
-              {props.scrolling ? <Pause /> : <Play />}
-            </Button>
-          </Tooltip>
+          <SongPreviewButton preview={props.preview} />
 
           <Tooltip label="Back to the top">
             <Button
@@ -102,20 +89,28 @@ export function PracticeDock(props: PracticeDockProps) {
             </Button>
           </Tooltip>
 
-          <div className="flex min-w-0 flex-1 items-center gap-2">
-            <Gauge className="size-3.5 shrink-0 text-ink-faint" />
-            <Slider
-              value={[props.scrollSpeed]}
-              min={5}
-              max={160}
-              step={1}
-              onValueChange={([value]) => props.onScrollSpeedChange(value)}
-              aria-label="Autoscroll speed in pixels per second"
-              className="min-w-0 flex-1"
-            />
-            <span className="w-14 shrink-0 text-right text-[11px] tabular-nums text-ink-faint">
-              {props.scrollSpeed} px/s
-            </span>
+          <div className="min-w-0 flex-1">
+            {props.preview.preview ? (
+              <p className="truncate text-xs text-ink">
+                {props.preview.playing ? "Playing preview" : "30s preview"}
+                <span className="text-ink-faint">
+                  {" · "}
+                  {props.preview.preview.trackName}
+                </span>
+              </p>
+            ) : (
+              <p className="truncate text-xs text-ink-faint">
+                {props.preview.loading ? "Finding a preview…" : "Metronome and loop"}
+              </p>
+            )}
+            {props.preview.playing ? (
+              <div className="mt-1 h-0.5 overflow-hidden rounded-full bg-surface-3">
+                <div
+                  className="h-full bg-amber"
+                  style={{ width: `${Math.round(props.preview.progress * 100)}%` }}
+                />
+              </div>
+            ) : null}
           </div>
 
           <Tooltip label={props.metronomeOn ? "Stop metronome" : "Start metronome"}>
