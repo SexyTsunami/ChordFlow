@@ -2,6 +2,7 @@
 
 import * as React from "react";
 import { LayoutGrid, List, Search, SlidersHorizontal } from "lucide-react";
+import { useLibrary } from "@/components/providers/library-provider";
 import { Badge, EmptyState, Input } from "@/components/ui/primitives";
 import { Button } from "@/components/ui/button";
 import type { Song } from "@/lib/domain/types";
@@ -36,6 +37,7 @@ export function SongBrowser({
   const [direction, setDirection] = React.useState<"asc" | "desc">("asc");
   const [view, setView] = React.useState<"list" | "grid">(defaultView);
   const [onlyWithChords, setOnlyWithChords] = React.useState(false);
+  const { favorites } = useLibrary();
 
   React.useEffect(() => {
     const params = new URLSearchParams(window.location.search);
@@ -62,6 +64,29 @@ export function SongBrowser({
       }),
     [scoped, query, sort, direction, onlyWithChords],
   );
+
+  const grouped = React.useMemo(() => {
+    if (!artist.trim()) {
+      return { favorites: [] as Song[], rest: results, split: false };
+    }
+    const favs: Song[] = [];
+    const rest: Song[] = [];
+    for (const song of results) {
+      if (favorites.has(song.id)) favs.push(song);
+      else rest.push(song);
+    }
+    return { favorites: favs, rest, split: favs.length > 0 };
+  }, [artist, favorites, results]);
+
+  function renderSongs(songs: Song[]) {
+    return view === "grid" ? (
+      <SongGrid songs={songs} />
+    ) : (
+      <div className="panel p-2">
+        <SongTable songs={songs} showIndex={showIndex} />
+      </div>
+    );
+  }
 
   return (
     <div className="space-y-4">
@@ -168,6 +193,23 @@ export function SongBrowser({
               : emptyDescription
           }
         />
+      ) : grouped.split ? (
+        <div className="space-y-5">
+          <div>
+            <p className="mb-2 px-0.5 text-[10px] font-medium tracking-[0.14em] text-amber uppercase">
+              Favourites
+            </p>
+            {renderSongs(grouped.favorites)}
+          </div>
+          {grouped.rest.length > 0 ? (
+            <div>
+              <p className="mb-2 px-0.5 text-[10px] font-medium tracking-[0.14em] text-ink-faint uppercase">
+                All songs
+              </p>
+              {renderSongs(grouped.rest)}
+            </div>
+          ) : null}
+        </div>
       ) : view === "grid" ? (
         <SongGrid songs={results} />
       ) : (
